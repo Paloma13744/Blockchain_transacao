@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain - Interface do Usuário</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Blockchain - Simulador de Transações</h1>
+    </header>
+
+    <div class="main-container">
+        <!-- Primeiro Contêiner -->
+        <div class="container">
+            <section>
+                <h2>Registro de Transação</h2>
+                <form id="transactionForm">
+                    <label for="sender">Remetente:</label>
+                    <input type="text" id="sender" required>
+                    <label for="recipient">Destinatário:</label>
+                    <input type="text" id="recipient" required>
+                    <label for="amount">Valor:</label>
+                    <input type="number" id="amount" required>
+                    <button type="submit">Registrar Transação</button>
+                </form>
+            </section>
+
+            <section>
+                <h2>Histórico de Transações</h2>
+                <button id="loadChainBtn">Carregamento do Histórico Local</button>
+                <div id="chainHistory"></div>
+            </section>
+        </div>
+
+        <!-- Segundo Contêiner -->
+        <div class="container2">
+            <section>
+                <h2>Selecione um Nó para Ver o Histórico</h2>
+                <label for="nodeSelect">Escolha um nó:</label>
+                <select id="nodeSelect">
+                    <option value="">Selecione um nó</option>
+                </select>
+                <button id="loadNodeHistoryBtn">Carregamento Histórico do Nó Selecionado</button>
+                <div id="nodeHistory"></div>
+            </section>
+
+            <section>
+                <h2>Nós Registrados</h2>
+                <div id="nodesList"></div>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 Blockchain Simulador de Transações. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

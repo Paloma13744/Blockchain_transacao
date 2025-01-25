@@ -1,0 +1,159 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+header {
+    background-color: #9932CC;
+    color: white;
+    text-align: center;
+    padding: 30px 0;
+    font-family: 'Museo Moderno', sans-serif;
+    box-shadow: 0 10px 20px rgba(32, 32, 32, 0.3);
+}
+
+h1 {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    font-size: 25px;
+    margin: 0;
+}
+
+.main-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.container, .container2 {
+    margin-top: 20px;
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    width: 30%;
+    background-color: rgba(222, 217, 217, 0.925);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    font-size: 20px;
+    color: #9932CC;
+    margin-bottom: 10px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+label {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+input, select {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 97.5%; 
+}
+
+
+#nodeSelect {
+    width: 100%; 
+}
+
+button {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    margin-top: 12px;
+    background-color: #0000CD;
+    color: white;
+    padding: 6px 10px;
+    font-size: 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 47px;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #9932CC;
+}
+
+#loadChainBtn {
+    width: 100%;
+}
+
+#chainHistory, #nodeHistory {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    font-size: 15px;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 400px;
+    overflow-y: auto;
+}
+
+#chainHistory ul, #nodeHistory ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#chainHistory li, #nodeHistory li {
+    background-color: #fff;
+    padding: 15px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#nodesList {
+    margin-top: 10px;
+    padding: 20px;
+    background-color: rgba(222, 217, 217, 0.925);
+    border-radius: 4px;
+}
+
+footer {
+    background-color: #9932CC;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 14px;
+    margin-top: auto;
+}
+
+footer p {
+    font-family: 'Poppins', sans-serif, Arial, Helvetica;
+    margin: 0;
+}
+
+footer a {
+    color: #87CEFA;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
