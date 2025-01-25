@@ -1,7 +1,8 @@
 # Blockchain Transação
-![image](https://github.com/user-attachments/assets/518aa468-5f54-4acb-9da1-eb59bab906e8)
+![image](https://github.com/user-attachments/assets/e9847b5c-c370-411a-a112-f4766a2c5314)
 
-Este projeto implementa um sistema de blockchain para gerenciamento de transações digitais, com a capacidade de minerar blocos, resolver conflitos automaticamente e permitir a criação e validação de transações entre nós conectados. Ele foi desenvolvido para simular o funcionamento básico de uma blockchain descentralizada, onde múltiplos nós podem interagir, e um nó central é responsável por iniciar e coordenar o processo.
+Este projeto implementa um sistema de blockchain para gerenciamento de transações digitais, com a capacidade de minerar blocos, resolver conflitos automaticamente e permitir a criação e validação de transações entre nós conectados. 
+Ele foi desenvolvido para simular o funcionamento básico de uma blockchain descentralizada, onde múltiplos nós podem interagir, e um nó central é responsável por iniciar e coordenar o processo.
 
 ## Funcionalidades
 
@@ -54,7 +55,7 @@ python blockchain.py -p 5000
 ```bash
 python blockchain.py -p 5001
 python blockchain.py -p 5002
-(Adicione quantos nós que você desejar)
+(Adicione quantos nós que desejar)
 ```
 
 ### Autora:
