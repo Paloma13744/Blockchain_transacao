@@ -8,6 +8,7 @@ import requests
 from flask_cors import CORS
 from threading import Thread
 
+
 class Blockchain:
     def __init__(self):
         self.current_transactions = []
@@ -16,7 +17,7 @@ class Blockchain:
 
         # Criação do bloco Gênesis
         self.new_block(previous_hash='1', proof=100)
-        
+
         # Geração de um identificador único para este nó
         self.node_identifier = str(uuid4()).replace('-', '')
 
@@ -39,7 +40,8 @@ class Blockchain:
             'amount': amount,
         }
         self.current_transactions.append(transaction)
-        self.propagate_transaction(transaction)  # Propagar transação para os outros nós
+        # Propagar transação para os outros nós
+        self.propagate_transaction(transaction)
         return self.last_block['index'] + 1
 
     @staticmethod
@@ -64,42 +66,62 @@ class Blockchain:
         guess = f'{last_proof}{proof}{last_hash}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash.startswith("0000")
-    
-    
+
     @staticmethod
     def register_to_central_node(central_node, this_node):
         try:
-            response = requests.post(f'{central_node}/nodes/register', json={'nodes': [this_node]})
+            response = requests.post(
+                f'{central_node}/nodes/register', json={'nodes': [this_node]})
             if response.status_code == 201:
                 print(f'Nó registrado com sucesso em {central_node}')
             else:
                 print(f'Falha ao registrar o nó em {central_node}')
         except requests.exceptions.RequestException as e:
             print(f'Erro ao tentar se conectar ao nó central: {e}')
-    
-    
-    
+
     def resolve_conflicts(self):
-        neighbours = self.nodes
-        new_chain = None
+        """
+        Implementa o consenso "50% + 1":
+        - Coleta as blockchains de todos os nós
+        - Conta quantos nós possuem cada blockchain
+        - Substitui a blockchain local apenas se uma cadeia for aceita pela maioria
+        """
+        chains = {}  # Dicionário para armazenar diferentes versões das blockchains
+        node_count = len(self.nodes) + 1  # Inclui o próprio nó
 
-        max_length = len(self.chain)
+        for node in self.nodes:
+            try:
+                response = requests.get(f'http://{node}/chain')
+                if response.status_code == 200:
+                    chain = response.json()['chain']
+                    # Obtém o hash do último bloco
+                    chain_hash = self.hash(chain[-1])
 
-        for node in neighbours:
-            response = requests.get(f'http://{node}/chain')
+                    # Conta quantos nós possuem essa blockchain específica
+                    if chain_hash not in chains:
+                        chains[chain_hash] = []
+                    chains[chain_hash].append(chain)
+            except Exception as e:
+                print(f"⚠️ Erro ao obter a blockchain do nó {node}: {e}")
+                continue  # Continua para o próximo nó
 
-            if response.status_code == 200:
-                length = response.json()['length']
-                chain = response.json()['chain']
+        # Encontrar a blockchain com mais votos
+        majority_chain = None
+        majority_count = 0
 
-                if length > max_length and self.valid_chain(chain):
-                    max_length = length
-                    new_chain = chain
+        for chain_hash, chain_list in chains.items():
+            if len(chain_list) > majority_count:
+                majority_count = len(chain_list)
+                majority_chain = chain_list[0]
 
-        if new_chain:
-            self.chain = new_chain
+        # Verifica se a blockchain escolhida tem a maioria (50% + 1)
+        if majority_chain and majority_count > node_count // 2:
+            self.chain = majority_chain  # Substitui pela cadeia com consenso
+            print(
+                f"🔄 Blockchain substituída com base no consenso (50% + 1): {majority_count}/{node_count} nós")
             return True
 
+        print("✅ Nenhuma substituição necessária. A blockchain local já está correta.")
         return False
 
     def propagate_transaction(self, transaction):
@@ -123,15 +145,18 @@ class Blockchain:
         else:
             raise ValueError('URL inválido')
 
+
 # Definição das rotas
 app = Flask(__name__)
 CORS(app)
 node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/nodes', methods=['GET'])
 def get_nodes():
@@ -140,12 +165,15 @@ def get_nodes():
     }
     return jsonify(response), 200
 
+
 @app.route('/mine', methods=['GET'])
 def mine():
     if blockchain.current_transactions:  # Garante que há transações para minerar
         last_block = blockchain.last_block
         proof = blockchain.proof_of_work(last_block)
-        blockchain.new_transaction(sender="0", recipient=node_identifier, amount=1)  # Criação da transação de recompensa
+        # Criação da transação de recompensa
+        blockchain.new_transaction(
+            sender="0", recipient=node_identifier, amount=1)
         block = blockchain.new_block(proof)
         response = {
             'message': "Novo bloco minerado com sucesso!",
@@ -158,6 +186,7 @@ def mine():
     else:
         return jsonify({'message': 'Nenhuma transação pendente para minerar.'}), 200
 
+
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
@@ -166,7 +195,8 @@ def new_transaction():
         return 'Valores ausentes', 400
 
     # Criação da transação
-    index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
+    index = blockchain.new_transaction(
+        values['sender'], values['recipient'], values['amount'])
 
     # Minerar um novo bloco após a transação
     last_block = blockchain.last_block
@@ -182,6 +212,7 @@ def new_transaction():
     }
     return jsonify(response), 201
 
+
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
@@ -189,6 +220,7 @@ def full_chain():
         'length': len(blockchain.chain),
     }
     return jsonify(response), 200
+
 
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
@@ -208,42 +240,22 @@ def register_nodes():
 @app.route('/resolve', methods=['GET'])
 def resolve():
     """
-    Resolves conflicts by checking the chains of neighboring nodes.
-    If a longer valid chain is found, it replaces the current chain.
-    Returns a message indicating if conflicts were resolved.
+    Rota para resolver conflitos entre nós da blockchain.
+    Esta função chama `resolve_conflicts()` da classe Blockchain.
     """
-    neighbours = blockchain.nodes
-    new_chain = None
-    max_length = len(blockchain.chain)
-
-    for node in neighbours:
-        try:
-            response = requests.get(f'http://{node}/chain')
-
-            if response.status_code == 200:
-                length = response.json()['length']
-                chain = response.json()['chain']
-
-                # Verifica se a cadeia recebida é válida e mais longa que a local
-                if length > max_length and blockchain.valid_chain(chain):
-                    max_length = length
-                    new_chain = chain
-        except requests.exceptions.RequestException as e:
-            print(f'Erro ao tentar se conectar ao nó {node}: {e}')
-
-    # Se encontrar uma cadeia mais longa, substitui a cadeia local
-    if new_chain:
-        blockchain.chain = new_chain
-        return jsonify({'resolved': True}), 200
-
-    return jsonify({'resolved': False}), 200
+    resolved = blockchain.resolve_conflicts()
+    if resolved:
+        return jsonify({'message': '🔄 Conflitos resolvidos! A blockchain foi atualizada.'}), 200
+    else:
+        return jsonify({'message': '✅ Nenhuma atualização necessária. A blockchain já está sincronizada.'}), 200
 
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
-    parser.add_argument('-p', '--port', default=5000, type=int, help='Porta para escutar')
+    parser.add_argument('-p', '--port', default=5000,
+                        type=int, help='Porta para escutar')
     args = parser.parse_args()
     port = args.port
 
@@ -251,6 +263,7 @@ if __name__ == '__main__':
     this_node = f"http://127.0.0.1:{port}"
 
     if port != 5000:  # Evita que o nó central tente se registrar nele mesmo
-        Thread(target=Blockchain.register_to_central_node, args=(central_node, this_node)).start()
+        Thread(target=Blockchain.register_to_central_node,
+               args=(central_node, this_node)).start()
 
     app.run(host='0.0.0.0', port=port)
