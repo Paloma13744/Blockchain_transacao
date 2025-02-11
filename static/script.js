@@ -64,7 +64,7 @@ $(document).ready(function () {
                         <hr>
                     </div>`;
                 });
-                $('#chainHistory').html(chainHistory); 
+                $('#chainHistory').html(chainHistory); // Certifique-se de que o elemento #chainHistory existe no HTML
             },
             error: function (error) {
                 alert('Erro ao carregar histórico');
