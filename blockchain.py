@@ -41,7 +41,6 @@ class Blockchain:
         }
         self.current_transactions.append(transaction)
         # Propagar transação para os outros nós
-        self.propagate_transaction(transaction)
         return self.last_block['index'] + 1
 
     @staticmethod
@@ -211,6 +210,25 @@ def new_transaction():
         'previous_hash': blockchain.last_block['previous_hash'],
     }
     return jsonify(response), 201
+
+
+@app.route('/transactions/propagate', methods=['POST'])
+def propagate_transaction_route():
+    values = request.get_json()
+    required = ['sender', 'recipient', 'amount']
+
+    if not all(k in values for k in required):
+        return jsonify({'error': 'Valores ausentes'}), 400
+
+    transaction = {
+        'sender': values['sender'],
+        'recipient': values['recipient'],
+        'amount': values['amount']
+    }
+
+    blockchain.propagate_transaction(transaction)
+
+    return jsonify({'message': 'Transação propagada para os nós'}), 200
 
 
 @app.route('/chain', methods=['GET'])
